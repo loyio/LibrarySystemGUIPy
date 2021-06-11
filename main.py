@@ -7,10 +7,10 @@ from tkinter import *
 from tkinter import ttk
 from PIL import Image
 
+
 class LibrarySystem:
 
     def __init__(self, root):
-
         root.title("图书管理系统")
         frame = ttk.Frame(root, borderwidth=5, relief="ridge", padding=(3, 3, 12, 12))
         namelbl = ttk.Label(frame, text="用户名: ")
@@ -20,8 +20,10 @@ class LibrarySystem:
         passwd = ttk.Entry(frame)
 
         role = StringVar()
+        role.set("student")
         rb_student = ttk.Radiobutton(frame, text='学生', variable=role, value="student")
         rb_manager = ttk.Radiobutton(frame, text='管理员', variable=role, value="manager")
+
 
         login = ttk.Button(frame, text="登录")
         register = ttk.Button(frame, text="注册")
@@ -29,7 +31,7 @@ class LibrarySystem:
         frame.grid(column=0, row=0, columnspan=6, rowspan=4, sticky=(N, S, E, W))
         namelbl.grid(column=2, row=0, columnspan=1, sticky=(N, S, E, W), padx=5)
         name.grid(column=3, row=0, columnspan=1, sticky=(N, S, E, W), padx=5)
-        passwdlbl.grid(column=2, row=1, columnspan=1 , sticky=(E, W), padx=5)
+        passwdlbl.grid(column=2, row=1, columnspan=1, sticky=(E, W), padx=5)
         passwd.grid(column=3, row=1, columnspan=1, sticky=(E, W), padx=5)
         rb_student.grid(column=2, row=2)
         rb_manager.grid(column=3, row=2)
@@ -49,10 +51,8 @@ class LibrarySystem:
         frame.rowconfigure(3, weight=4)
         frame.rowconfigure(4, weight=4)
 
-
     def calculate(self):
-            pass
-
+        pass
 
 
 if __name__ == '__main__':
