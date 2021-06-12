@@ -8,21 +8,28 @@ from tkinter import messagebox
 from tkinter import ttk
 from PIL import Image, ImageTk
 from DBOperator import *
+from tkmacosx import Button
 
 
 class LibrarySystem:
 
     def __init__(self, root):
-        root.title("图书管理系统")
         root.resizable(False, False)
-        root.iconbitmap("resources/icon.ico")
+        logo = PhotoImage(file='resources/icon.png')
+        root.call('wm', 'iconphoto', root._w, logo)
+        root.title("图书管理系统")
+        root.configure(background='red')
         ws = root.winfo_screenwidth()
         hs = root.winfo_screenheight()
-        coordinate = '+%d+%d' % ((ws - 426) / 2, (hs - 371) / 2)
-        root.geometry(coordinate)
-        frame = ttk.Frame(root, borderwidth=5, relief="ridge", padding=(3, 3, 12, 12))
 
-        welcome_img = ImageTk.PhotoImage(Image.open("resources/welcome.png").resize((300, 133)))
+
+        frame = ttk.Frame(root, relief="flat")
+
+        left_panel_img = ImageTk.PhotoImage(Image.open("resources/background.png"))
+        left_panel_lbl = ttk.Label(frame, image=left_panel_img, borderwidth =0)
+        left_panel_lbl.image = left_panel_img
+
+        welcome_img = ImageTk.PhotoImage(Image.open("resources/welcome.png"))
 
         welcomelbl = ttk.Label(frame, image=welcome_img)
         welcomelbl.image = welcome_img
@@ -31,26 +38,29 @@ class LibrarySystem:
         self.name_entry = ttk.Entry(frame)
 
         passwd_lbl = ttk.Label(frame, text="密    码: ")
-        self.password_entry = ttk.Entry(frame)
+        self.password_entry = ttk.Entry(frame, show="●")
 
         self.role = StringVar()
         self.role.set("student")
         rb_student = ttk.Radiobutton(frame, text='学生', variable=self.role, value="student")
         rb_manager = ttk.Radiobutton(frame, text='管理员', variable=self.role, value="manager")
 
-        login = ttk.Button(frame, text="登录", command=self.login_command)
-        register = ttk.Button(frame, text="注册", command=self.register_command)
+        login = Button(frame, text="登录", background='#AE0E36', foreground='white',overbackground='#D32E5E', activebackground=('#AE0E36', '#D32E5E'),command=self.login_command)
+        register = Button(frame, text="注册", background='#667eea', foreground='white',overbackground='#764ba2', activebackground=('#667eea', '#764ba2'), command=self.register_command)
 
         frame.grid(column=0, row=0, columnspan=6, rowspan=5, sticky=(N, S, E, W))
         welcomelbl.grid(column=2, row=0, columnspan=2, sticky=(N, S, E, W), padx=50)
+        left_panel_lbl.grid(column=0, row=0, columnspan=1, rowspan=5)
         name_lbl.grid(column=2, row=1, columnspan=1, sticky=E, padx=50, pady=20)
         self.name_entry.grid(column=3, row=1, columnspan=1, sticky=W, pady=20)
         passwd_lbl.grid(column=2, row=2, columnspan=1, sticky=E, padx=50)
         self.password_entry.grid(column=3, row=2, columnspan=1, sticky=W)
-        rb_student.grid(column=2, row=3, pady=20)
-        rb_manager.grid(column=3, row=3, pady=20)
+        rb_student.grid(column=2, row=3, pady=20, sticky=E)
+        rb_manager.grid(column=3, row=3, pady=20, sticky=W, padx=10)
         login.grid(column=2, row=4, columnspan=1)
         register.grid(column=3, row=4, columnspan=1)
+        coordinate = '+%d+%d' % ((ws - left_panel_img.width() - welcome_img.width()) / 2, (hs - left_panel_img.height() - welcome_img.height()) / 2)
+        root.geometry(coordinate)
 
         # root.columnconfigure(0, weight=1)
         # root.rowconfigure(0, weight=1)
@@ -67,19 +77,33 @@ class LibrarySystem:
         # frame.rowconfigure(5, weight=5)
 
     def login_command(self):
-        print(self.name_entry.get())
-        print(self.role.get())
+        if self.name_entry.get() == "" or self.password_entry.get() == "":
+            messagebox.showerror(message='账户名或密码为空，请重新输入', icon="error")
+        else:
+            print(self.name_entry.get())
+            dbo = DBOperator()
+            res = dbo.register("niuniu", "123456", "manager")
+            if res[0] == 1:
+                messagebox.showinfo(message='恭喜你登录成功！！！', icon='info')
+            else:
+                messagebox.showerror(message='登录失败！！！', detail="用户名重复，或内部错误", icon="error")
+            pass
         pass
 
     def register_command(self):
-        print(self.name_entry.get())
-        dbo = DBOperator()
-        res = dbo.register("niuniu", "123456", "manager")
-        if res[0] == 1:
-            messagebox.showinfo(message='恭喜你注册成功！！！', icon='info')
+        if self.role.get() == "manager":
+            messagebox.showerror(message='不允许注册管理员账户', icon="error")
+        elif self.name_entry.get() == "" or self.password_entry.get() == "":
+            messagebox.showerror(message='账户名或密码为空，请重新输入', icon="error")
         else:
-            messagebox.showerror(message='很遗憾，注册失败！！！', detail="用户名重复，或内部错误", icon="error")
-        pass
+            print(self.name_entry.get())
+            dbo = DBOperator()
+            res = dbo.register("niuniu", "123456", "manager")
+            if res[0] == 1:
+                messagebox.showinfo(message='恭喜你注册成功！！！', icon='info')
+            else:
+                messagebox.showerror(message='很遗憾，注册失败！！！', detail="用户名重复，或内部错误", icon="error")
+            pass
 
 
 if __name__ == '__main__':
