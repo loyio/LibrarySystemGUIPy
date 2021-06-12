@@ -8,7 +8,7 @@ from tkinter import messagebox
 from tkinter import ttk
 from PIL import Image, ImageTk
 from DBOperator import *
-from tkmacosx import Button
+from tkmacosx import Button,SFrame, check_appearance
 
 
 class LibrarySystem:
@@ -18,15 +18,20 @@ class LibrarySystem:
         logo = PhotoImage(file='resources/icon.png')
         root.call('wm', 'iconphoto', root._w, logo)
         root.title("图书管理系统")
-        root.configure(background='red')
+        root['bg'] = '#333'
         ws = root.winfo_screenwidth()
         hs = root.winfo_screenheight()
 
+        s = ttk.Style()
+        s.configure('black.TRadiobutton', background="white", foreground="black")
+        s.configure('black.TFrame', background="black", foreground="black")
+        s.configure('black.TLabelframe', background="white", foreground="black")
+        s.configure('black.TLabel', foreground="black")
 
-        frame = ttk.Frame(root, relief="flat")
+        frame = Frame(root, relief="flat")
 
         left_panel_img = ImageTk.PhotoImage(Image.open("resources/background.png"))
-        left_panel_lbl = ttk.Label(frame, image=left_panel_img, borderwidth =0)
+        left_panel_lbl = ttk.Label(frame, image=left_panel_img, borderwidth=0)
         left_panel_lbl.image = left_panel_img
 
         welcome_img = ImageTk.PhotoImage(Image.open("resources/welcome.png"))
@@ -34,24 +39,28 @@ class LibrarySystem:
         welcomelbl = ttk.Label(frame, image=welcome_img)
         welcomelbl.image = welcome_img
 
-        name_lbl = ttk.Label(frame, text="用户名: ")
-        self.name_entry = ttk.Entry(frame)
+        name_frame = ttk.LabelFrame(frame, relief="flat", text="用户名", style="black.TLabelframe")
+        # name_lbl = ttk.Label(name_frame, text="用户名: ")
+        self.name_entry = ttk.Entry(name_frame)
 
         passwd_lbl = ttk.Label(frame, text="密    码: ")
         self.password_entry = ttk.Entry(frame, show="●")
 
         self.role = StringVar()
         self.role.set("student")
-        rb_student = ttk.Radiobutton(frame, text='学生', variable=self.role, value="student")
-        rb_manager = ttk.Radiobutton(frame, text='管理员', variable=self.role, value="manager")
+        rb_student = ttk.Radiobutton(frame, text='学生', variable=self.role, value="student", style='black.TRadiobutton')
+        rb_manager = ttk.Radiobutton(frame, text='管理员', variable=self.role, value="manager", style="black.TRadiobutton")
 
-        login = Button(frame, text="登录", background='#AE0E36', foreground='white',overbackground='#D32E5E', activebackground=('#AE0E36', '#D32E5E'),command=self.login_command)
-        register = Button(frame, text="注册", background='#667eea', foreground='white',overbackground='#764ba2', activebackground=('#667eea', '#764ba2'), command=self.register_command)
+        login = Button(frame, text="登录", background='#AE0E36', foreground='white', overbackground='#D32E5E',
+                       activebackground=('#AE0E36', '#D32E5E'), command=self.login_command)
+        register = Button(frame, text="注册", background='#667eea', foreground='white', overbackground='#764ba2',
+                          activebackground=('#667eea', '#764ba2'), command=self.register_command)
 
         frame.grid(column=0, row=0, columnspan=6, rowspan=5, sticky=(N, S, E, W))
         welcomelbl.grid(column=2, row=0, columnspan=2, sticky=(N, S, E, W), padx=50)
         left_panel_lbl.grid(column=0, row=0, columnspan=1, rowspan=5)
-        name_lbl.grid(column=2, row=1, columnspan=1, sticky=E, padx=50, pady=20)
+        name_frame.grid(column=2, row=1, columnspan=1, sticky=E, padx=50, pady=20)
+        # name_lbl.grid(column=2, row=1, columnspan=1, sticky=E, padx=50, pady=20)
         self.name_entry.grid(column=3, row=1, columnspan=1, sticky=W, pady=20)
         passwd_lbl.grid(column=2, row=2, columnspan=1, sticky=E, padx=50)
         self.password_entry.grid(column=3, row=2, columnspan=1, sticky=W)
@@ -59,7 +68,8 @@ class LibrarySystem:
         rb_manager.grid(column=3, row=3, pady=20, sticky=W, padx=10)
         login.grid(column=2, row=4, columnspan=1)
         register.grid(column=3, row=4, columnspan=1)
-        coordinate = '+%d+%d' % ((ws - left_panel_img.width() - welcome_img.width()) / 2, (hs - left_panel_img.height() - welcome_img.height()) / 2)
+        coordinate = '+%d+%d' % ((ws - left_panel_img.width() - welcome_img.width()) / 2,
+                                 (hs - left_panel_img.height() - welcome_img.height()) / 2)
         root.geometry(coordinate)
 
         # root.columnconfigure(0, weight=1)
