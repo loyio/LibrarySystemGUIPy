@@ -8,7 +8,7 @@ from tkinter import messagebox
 from tkinter import ttk
 from PIL import Image, ImageTk
 from DBOperator import *
-from tkmacosx import Button,SFrame, check_appearance
+from tkmacosx import Button
 
 
 class LibrarySystem:
@@ -39,12 +39,11 @@ class LibrarySystem:
         welcomelbl = ttk.Label(frame, image=welcome_img)
         welcomelbl.image = welcome_img
 
-        name_frame = ttk.LabelFrame(frame, relief="flat", text="用户名", style="black.TLabelframe")
-        # name_lbl = ttk.Label(name_frame, text="用户名: ")
-        self.name_entry = ttk.Entry(name_frame)
+        name_frame = LabelFrame(frame, relief="ridge", text=" 用户名 : ", borderwidth=5)
+        self.name_entry = Entry(name_frame, bd=0, bg="#EBEBEB", highlightthickness=0,font=('Monaco', '25'))
 
-        passwd_lbl = ttk.Label(frame, text="密    码: ")
-        self.password_entry = ttk.Entry(frame, show="●")
+        passwd_frame = LabelFrame(frame, relief="ridge", text=" 密    码 : ", borderwidth=5)
+        self.password_entry = Entry(passwd_frame, show="●", bd=0, bg="#EBEBEB", highlightthickness=0,font=('Helvetica', '25'))
 
         self.role = StringVar()
         self.role.set("student")
@@ -59,11 +58,10 @@ class LibrarySystem:
         frame.grid(column=0, row=0, columnspan=6, rowspan=5, sticky=(N, S, E, W))
         welcomelbl.grid(column=2, row=0, columnspan=2, sticky=(N, S, E, W), padx=50)
         left_panel_lbl.grid(column=0, row=0, columnspan=1, rowspan=5)
-        name_frame.grid(column=2, row=1, columnspan=1, sticky=E, padx=50, pady=20)
-        # name_lbl.grid(column=2, row=1, columnspan=1, sticky=E, padx=50, pady=20)
-        self.name_entry.grid(column=3, row=1, columnspan=1, sticky=W, pady=20)
-        passwd_lbl.grid(column=2, row=2, columnspan=1, sticky=E, padx=50)
-        self.password_entry.grid(column=3, row=2, columnspan=1, sticky=W)
+        name_frame.grid(column=2, row=1, columnspan=2, sticky=(N, S, E, W), padx=50,pady=15)
+        self.name_entry.grid(sticky=(N, S, E, W))
+        passwd_frame.grid(column=2, row=2, columnspan=2, sticky=(N, S, E, W), padx=50, pady=15)
+        self.password_entry.grid(sticky=(N, S, E, W))
         rb_student.grid(column=2, row=3, pady=20, sticky=E)
         rb_manager.grid(column=3, row=3, pady=20, sticky=W, padx=10)
         login.grid(column=2, row=4, columnspan=1)
