@@ -20,8 +20,19 @@ class DBOperator:
                                     charset='utf8mb4',
                                     cursorclass=pymysql.cursors.DictCursor)
 
-    def login(self, username, passwd, role):
-        pass
+    def login(self, username, passwd):
+        with self.conn:
+            with self.conn.cursor() as cursor:
+                sql = "SELECT * FROM `users` where u_name = %s and u_passwd = %s"
+                try:
+                    res = [int(cursor.execute(sql, (username, passwd)))]
+                    if res[0] == 1:
+                        res.append(cursor.fetchone()["u_role"])
+                except Exception as e:
+                    logging.error(e)
+                    res = [0]
+            self.conn.commit()
+        return res
 
     def register(self, username, passwd, role):
         with self.conn:
@@ -32,5 +43,19 @@ class DBOperator:
                 except Exception as e:
                     logging.error(e)
                     res = [0, e]
+            self.conn.commit()
+        return res
+
+    def books_multi_condition_search(self, book_key):
+        with self.conn:
+            with self.conn.cursor() as cursor:
+                sql = "SELECT * FROM `book` where concat(IFNULL(book_id, ''),IFNULL(book_name, ''), IFNULL(book_author, ''), IFNULL(book_press, '')) like concat ('%"+book_key+"%')"
+                try:
+                    res = [int(cursor.execute(sql))]
+                    if res[0] == 1:
+                        res.append(cursor.fetchall())
+                except Exception as e:
+                    logging.error(e)
+                    res = [0]
             self.conn.commit()
         return res

@@ -9,6 +9,7 @@ from tkinter import ttk
 from PIL import Image, ImageTk
 from DBOperator import *
 from tkmacosx import Button
+from Library import Manager, Student
 
 
 class LibrarySystem:
@@ -21,6 +22,9 @@ class LibrarySystem:
         root['bg'] = '#333'
         ws = root.winfo_screenwidth()
         hs = root.winfo_screenheight()
+
+        # static variable
+        self.login_role = ""
 
         s = ttk.Style()
         s.configure('black.TRadiobutton', background="white", foreground="black")
@@ -40,10 +44,11 @@ class LibrarySystem:
         welcomelbl.image = welcome_img
 
         name_frame = LabelFrame(frame, relief="ridge", text=" 用户名 : ", borderwidth=5)
-        self.name_entry = Entry(name_frame, bd=0, bg="#EBEBEB", highlightthickness=0,font=('Monaco', '25'))
+        self.name_entry = Entry(name_frame, bd=0, bg="#EBEBEB", highlightthickness=0, font=('Monaco', '25'))
 
         passwd_frame = LabelFrame(frame, relief="ridge", text=" 密    码 : ", borderwidth=5)
-        self.password_entry = Entry(passwd_frame, show="●", bd=0, bg="#EBEBEB", highlightthickness=0,font=('Helvetica', '25'))
+        self.password_entry = Entry(passwd_frame, show="●", bd=0, bg="#EBEBEB", highlightthickness=0,
+                                    font=('Helvetica', '25'))
 
         self.role = StringVar()
         self.role.set("student")
@@ -58,7 +63,7 @@ class LibrarySystem:
         frame.grid(column=0, row=0, columnspan=6, rowspan=5, sticky=(N, S, E, W))
         welcomelbl.grid(column=2, row=0, columnspan=2, sticky=(N, S, E, W), padx=50)
         left_panel_lbl.grid(column=0, row=0, columnspan=1, rowspan=5)
-        name_frame.grid(column=2, row=1, columnspan=2, sticky=(N, S, E, W), padx=50,pady=15)
+        name_frame.grid(column=2, row=1, columnspan=2, sticky=(N, S, E, W), padx=50, pady=15)
         self.name_entry.grid(sticky=(N, S, E, W))
         passwd_frame.grid(column=2, row=2, columnspan=2, sticky=(N, S, E, W), padx=50, pady=15)
         self.password_entry.grid(sticky=(N, S, E, W))
@@ -88,13 +93,15 @@ class LibrarySystem:
         if self.name_entry.get() == "" or self.password_entry.get() == "":
             messagebox.showerror(message='账户名或密码为空，请重新输入', icon="error")
         else:
-            print(self.name_entry.get())
             dbo = DBOperator()
-            res = dbo.register("niuniu", "123456", "manager")
+            res = dbo.login(self.name_entry.get(), self.password_entry.get())
             if res[0] == 1:
                 messagebox.showinfo(message='恭喜你登录成功！！！', icon='info')
+                root.destroy()
+                self.login_role = res[1]
+                self.role_entry_window()
             else:
-                messagebox.showerror(message='登录失败！！！', detail="用户名重复，或内部错误", icon="error")
+                messagebox.showerror(message='登录失败！！！', detail="用户名或密码错误！！！", icon="error")
             pass
         pass
 
@@ -106,12 +113,18 @@ class LibrarySystem:
         else:
             print(self.name_entry.get())
             dbo = DBOperator()
-            res = dbo.register("niuniu", "123456", "manager")
+            res = dbo.register(self.name_entry.get(), self.password_entry.get(), self.role.get())
             if res[0] == 1:
                 messagebox.showinfo(message='恭喜你注册成功！！！', icon='info')
             else:
                 messagebox.showerror(message='很遗憾，注册失败！！！', detail="用户名重复，或内部错误", icon="error")
             pass
+
+    def role_entry_window(self):
+        if self.role == "manager":
+            Manager.Manager()
+        else:
+            Student.Student()
 
 
 if __name__ == '__main__':
