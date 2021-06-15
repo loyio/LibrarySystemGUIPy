@@ -52,10 +52,28 @@ class DBOperator:
                 sql = "SELECT * FROM `book` where concat(IFNULL(book_id, ''),IFNULL(book_name, ''), IFNULL(book_author, ''), IFNULL(book_press, '')) like concat ('%"+book_key+"%')"
                 try:
                     res = [int(cursor.execute(sql))]
-                    if res[0] == 1:
+                    if res[0] == 0:
+                        res.append("error")
+                    else:
                         res.append(cursor.fetchall())
                 except Exception as e:
                     logging.error(e)
-                    res = [0]
+                    res = [0, "error"]
+            self.conn.commit()
+        return res
+
+    def add_new_book(self, b_name, b_author, b_press, b_quantity):
+        with self.conn:
+            with self.conn.cursor() as cursor:
+                sql = "INSERT INTO `book` (`book_name`, `book_author`, `book_press`, `book_quantity`) VALUES (%s, %s, %s, %s)"
+                try:
+                    res = [int(cursor.execute(sql, (b_name, b_author, b_press, b_quantity)))]
+                    if res[0] == 0:
+                        res.append("error")
+                    else:
+                        res.append("success")
+                except Exception as e:
+                    logging.error(e)
+                    res = [0, "error"]
             self.conn.commit()
         return res

@@ -71,23 +71,13 @@ class LibrarySystem:
         rb_manager.grid(column=3, row=3, pady=20, sticky=W, padx=10)
         login.grid(column=2, row=4, columnspan=1)
         register.grid(column=3, row=4, columnspan=1)
+
+        self.name_entry.bind("<Return>", lambda event: self.login_command())
+        self.password_entry.bind("<Return>", lambda event: self.login_command())
+
         coordinate = '+%d+%d' % ((ws - left_panel_img.width() - welcome_img.width()) / 2,
                                  (hs - left_panel_img.height() - welcome_img.height()) / 2)
         root.geometry(coordinate)
-
-        # root.columnconfigure(0, weight=1)
-        # root.rowconfigure(0, weight=1)
-        # frame.columnconfigure(0, weight=6)
-        # frame.columnconfigure(1, weight=6)
-        # frame.columnconfigure(2, weight=6)
-        # frame.columnconfigure(3, weight=6)
-        # frame.columnconfigure(4, weight=6)
-        # frame.columnconfigure(5, weight=6)
-        # frame.rowconfigure(1, weight=5)
-        # frame.rowconfigure(2, weight=5)
-        # frame.rowconfigure(3, weight=5)
-        # frame.rowconfigure(4, weight=5)
-        # frame.rowconfigure(5, weight=5)
 
     def login_command(self):
         if self.name_entry.get() == "" or self.password_entry.get() == "":
@@ -102,8 +92,6 @@ class LibrarySystem:
                 self.role_entry_window()
             else:
                 messagebox.showerror(message='登录失败！！！', detail="用户名或密码错误！！！", icon="error")
-            pass
-        pass
 
     def register_command(self):
         if self.role.get() == "manager":
@@ -121,7 +109,7 @@ class LibrarySystem:
             pass
 
     def role_entry_window(self):
-        if self.role == "manager":
+        if self.login_role == "manager":
             Manager.Manager()
         else:
             Student.Student()
