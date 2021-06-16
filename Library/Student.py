@@ -74,6 +74,3 @@ class Student:
                 values = list(res[1][i].values())
                 self.book_tree.insert('', i, values=values)
 
-
-if __name__ == '__main__':
-    student = Student()

@@ -113,7 +113,7 @@ class BookEditWindow(Toplevel):
         self.resizable(False, False)
         self.grab_set()
 
-        self.setup_UI()
+        self.setup_ui()
 
         if self.is_edit:
             print(args[0])
@@ -126,7 +126,7 @@ class BookEditWindow(Toplevel):
         coordinate = '+%d+%d' % (ws / 2, hs / 2)
         self.geometry(coordinate)
 
-    def setup_UI(self):
+    def setup_ui(self):
         label_name = ttk.Label(self, text="名称: ")
         entry_name = ttk.Entry(self, textvariable=self.b_name)
 
@@ -182,6 +182,3 @@ class BookEditWindow(Toplevel):
         self.grab_release()
         self.destroy()
 
-
-if __name__ == '__main__':
-    Manager()
