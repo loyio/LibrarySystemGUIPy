@@ -77,3 +77,35 @@ class DBOperator:
                     res = [0, "error"]
             self.conn.commit()
         return res
+
+    def update_book_in_library(self, b_id, b_name, b_author, b_press, b_quantity):
+        with self.conn:
+            with self.conn.cursor() as cursor:
+                sql = "UPDATE `book` set `book_name` = %s, `book_author` = %s, `book_press` = %s, `book_quantity` = %s where `book_id`=%s"
+                try:
+                    res = [int(cursor.execute(sql, (b_name, b_author, b_press, b_quantity, b_id)))]
+                    if res[0] == 0:
+                        res.append("error")
+                    else:
+                        res.append("success")
+                except Exception as e:
+                    logging.error(e)
+                    res = [0, "error"]
+            self.conn.commit()
+        return res
+
+    def delete_book_in_library(self, b_id):
+        with self.conn:
+            with self.conn.cursor() as cursor:
+                sql = "delete from `book` where `book_id`=%s"
+                try:
+                    res = [int(cursor.execute(sql, b_id))]
+                    if res[0] == 0:
+                        res.append("error")
+                    else:
+                        res.append("success")
+                except Exception as e:
+                    logging.error(e)
+                    res = [0, "error"]
+            self.conn.commit()
+        return res

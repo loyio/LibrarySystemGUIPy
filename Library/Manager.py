@@ -6,9 +6,7 @@
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
-from PIL import Image, ImageTk
 from DBOperator import *
-from tkmacosx import Button
 
 
 class Manager:
@@ -28,7 +26,7 @@ class Manager:
         add_btn = ttk.Button(frame, text="新增书籍", command=self.add_book_to_library)
         delete_btn = ttk.Button(frame, text="删除书籍", command=self.delete_book_in_library)
 
-        yscrollbar = ttk.Scrollbar(frame, orient='vertical')  # 右边的滑动按钮
+        yscrollbar = ttk.Scrollbar(frame, orient='vertical')
         self.book_tree = ttk.Treeview(frame, columns=('1', '2', '3', '4', '5'), show="headings",
                                       yscrollcommand=yscrollbar.set)
         self.book_tree.column('1', width=150, anchor='center')
@@ -48,6 +46,7 @@ class Manager:
         add_btn.grid(column=3, row=0, columnspan=1, sticky=(N, S, E), padx=50, pady=15)
         delete_btn.grid(column=4, row=0, columnspan=1, sticky=(N, S, W), pady=15)
         self.book_tree.grid(column=1, row=1, columnspan=4, sticky=(N, S, E, W), padx=50)
+        self.book_tree.bind("<Double-1>", self.edit_book_in_library)
 
         self.m_window.columnconfigure(0, weight=1)
         self.m_window.rowconfigure(0, weight=1)
@@ -80,14 +79,28 @@ class Manager:
                 self.book_tree.insert('', i, values=values)
 
     def add_book_to_library(self):
-        self.book_edit_book = BookEditWindow(self.m_window, 0)
+        add_book_window = BookEditWindow(self.m_window, 0)
+        if add_book_window.is_success:
+            pass
+
+    def edit_book_in_library(self, event):
+        edit_book_window = BookEditWindow(self.m_window, 1, self.book_tree.item(self.book_tree.selection()[0])["values"])
+        if edit_book_window.is_success:
+            pass
 
     def delete_book_in_library(self):
-        pass
+        if len(self.book_tree.selection()) == 0:
+            messagebox.showerror(message='请选择你要删除的书籍！！', icon="error")
+        else:
+            dbo = DBOperator()
+            dbo.delete_book_in_library(self.book_tree.item(self.book_tree.selection()[0])["values"][0])
+
 
 
 class BookEditWindow:
     def __init__(self, master, is_edit, *args):
+        self.is_edit = is_edit
+        self.is_success = 0
         top = self.top = Toplevel(master)
         top.title("编辑书籍" if is_edit else "新增书籍")
         ws = top.winfo_screenwidth()
@@ -107,6 +120,14 @@ class BookEditWindow:
         label_quantity = ttk.Label(top, text="数量: ")
         self.entry_quantity = ttk.Entry(top)
 
+        if is_edit:
+            print(args[0])
+            self.book_id = args[0][0]
+            self.entry_name.insert(0, args[0][1])
+            self.entry_author.insert(0, args[0][2])
+            self.entry_press.insert(0, args[0][3])
+            self.entry_quantity.insert(0, args[0][4])
+
         self.btn_ensure = ttk.Button(top, text="确认", command=self.ensure_command)
         self.btn_cancel = ttk.Button(top, text="取消", command=self.cancel_command)
 
@@ -125,7 +146,19 @@ class BookEditWindow:
         top.geometry(coordinate)
 
     def ensure_command(self):
-        pass
+        dbo = DBOperator()
+        if self.is_edit:
+            res = dbo.update_book_in_library(self.entry_name.get(), self.entry_author.get(),
+                                             self.entry_press.get(), self.entry_quantity.get(), self.book_id)
+            if res[0]:
+                self.is_success = 1
+
+
+        else:
+            res = dbo.add_new_book(self.entry_name.get(), self.entry_author.get(),
+                                   self.entry_press.get(), self.entry_quantity.get())
+            if res[1]:
+                self.is_success = 1
 
     def cancel_command(self):
         self.top.grab_release()

@@ -25,7 +25,7 @@ class Student:
 
         search_btn = ttk.Button(frame, text="搜索", command=self.search_in_library)
 
-        yscrollbar = ttk.Scrollbar(frame, orient='vertical')  # 右边的滑动按钮
+        yscrollbar = ttk.Scrollbar(frame, orient='vertical')
         self.book_tree = ttk.Treeview(frame, columns=('1', '2', '3', '4', '5'), show="headings",
                                       yscrollcommand=yscrollbar.set)
         self.book_tree.column('1', width=150, anchor='center')
