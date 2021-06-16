@@ -79,14 +79,14 @@ class Manager:
                 self.book_tree.insert('', i, values=values)
 
     def add_book_to_library(self):
-        add_book_window = BookEditWindow(self.m_window, 0)
-        if add_book_window.is_success:
-            pass
+        book_add_window = BookEditWindow(self.m_window, 0)
+        self.m_window.wait_window(book_add_window)
+        self.search_in_library()
 
     def edit_book_in_library(self, event):
-        edit_book_window = BookEditWindow(self.m_window, 1, self.book_tree.item(self.book_tree.selection()[0])["values"])
-        if edit_book_window.is_success:
-            pass
+        book_edit_window = BookEditWindow(self.m_window, 1, self.book_tree.item(self.book_tree.selection()[0])["values"])
+        self.m_window.wait_window(book_edit_window)
+        self.search_in_library()
 
     def delete_book_in_library(self):
         if len(self.book_tree.selection()) == 0:
@@ -94,75 +94,93 @@ class Manager:
         else:
             dbo = DBOperator()
             dbo.delete_book_in_library(self.book_tree.item(self.book_tree.selection()[0])["values"][0])
+            self.search_in_library()
 
 
-
-class BookEditWindow:
-    def __init__(self, master, is_edit, *args):
+class BookEditWindow(Toplevel):
+    def __init__(self, master, is_edit, *args, **kw):
+        super().__init__(master, **kw)
         self.is_edit = is_edit
-        self.is_success = 0
-        top = self.top = Toplevel(master)
-        top.title("编辑书籍" if is_edit else "新增书籍")
-        ws = top.winfo_screenwidth()
-        hs = top.winfo_screenheight()
+        self.title("编辑书籍" if is_edit else "新增书籍")
+        ws = self.winfo_screenwidth()
+        hs = self.winfo_screenheight()
 
-        top.resizable(False, False)
-        top.grab_set()
-        label_name = ttk.Label(top, text="名称: ")
-        self.entry_name = ttk.Entry(top)
+        self.b_name = StringVar()
+        self.b_author = StringVar()
+        self.b_press = StringVar()
+        self.b_quantity = StringVar()
 
-        label_author = ttk.Label(top, text="作者: ")
-        self.entry_author = ttk.Entry(top)
+        self.resizable(False, False)
+        self.grab_set()
 
-        label_press = ttk.Label(top, text="出版社: ")
-        self.entry_press = ttk.Entry(top)
+        self.setup_UI()
 
-        label_quantity = ttk.Label(top, text="数量: ")
-        self.entry_quantity = ttk.Entry(top)
-
-        if is_edit:
+        if self.is_edit:
             print(args[0])
             self.book_id = args[0][0]
-            self.entry_name.insert(0, args[0][1])
-            self.entry_author.insert(0, args[0][2])
-            self.entry_press.insert(0, args[0][3])
-            self.entry_quantity.insert(0, args[0][4])
-
-        self.btn_ensure = ttk.Button(top, text="确认", command=self.ensure_command)
-        self.btn_cancel = ttk.Button(top, text="取消", command=self.cancel_command)
-
-        label_name.grid(column=0, row=0, columnspan=1, sticky=(N, S, W, E), padx=20)
-        self.entry_name.grid(column=1, row=0, columnspan=1, sticky=(N, S, W, E))
-        label_author.grid(column=0, row=1, columnspan=1, sticky=(N, S, W), padx=20)
-        self.entry_author.grid(column=1, row=1, columnspan=1, sticky=(N, S, E))
-        label_press.grid(column=0, row=2, columnspan=1, sticky=(N, S, W), padx=20)
-        self.entry_press.grid(column=1, row=2, columnspan=1, sticky=(N, S, E))
-        label_quantity.grid(column=0, row=3, columnspan=1, sticky=(N, S, W), padx=20)
-        self.entry_quantity.grid(column=1, row=3, columnspan=1, sticky=(N, S, E))
-        self.btn_ensure.grid(column=0, row=4, columnspan=1, sticky=(N, S, E, W), pady=20)
-        self.btn_cancel.grid(column=1, row=4, columnspan=1, sticky=(N, S, W, E))
+            self.b_name.set(args[0][1])
+            self.b_author.set(args[0][2])
+            self.b_press.set(args[0][3])
+            self.b_quantity.set(args[0][4])
 
         coordinate = '+%d+%d' % (ws / 2, hs / 2)
-        top.geometry(coordinate)
+        self.geometry(coordinate)
+
+    def setup_UI(self):
+        label_name = ttk.Label(self, text="名称: ")
+        entry_name = ttk.Entry(self, textvariable=self.b_name)
+
+        label_author = ttk.Label(self, text="作者: ")
+        entry_author = ttk.Entry(self, textvariable=self.b_author)
+
+        label_press = ttk.Label(self, text="出版社: ")
+        entry_press = ttk.Entry(self, textvariable=self.b_press)
+
+        label_quantity = ttk.Label(self, text="数量: ")
+        entry_quantity = ttk.Entry(self, textvariable=self.b_quantity)
+
+        btn_ensure = ttk.Button(self, text="确认", command=self.ensure_command)
+        btn_cancel = ttk.Button(self, text="取消", command=self.window_exit)
+
+        label_name.grid(column=0, row=0, columnspan=1, sticky=(N, S, W, E), padx=20)
+        entry_name.grid(column=1, row=0, columnspan=1, sticky=(N, S, W, E))
+        label_author.grid(column=0, row=1, columnspan=1, sticky=(N, S, W), padx=20)
+        entry_author.grid(column=1, row=1, columnspan=1, sticky=(N, S, E))
+        label_press.grid(column=0, row=2, columnspan=1, sticky=(N, S, W), padx=20)
+        entry_press.grid(column=1, row=2, columnspan=1, sticky=(N, S, E))
+        label_quantity.grid(column=0, row=3, columnspan=1, sticky=(N, S, W), padx=20)
+        entry_quantity.grid(column=1, row=3, columnspan=1, sticky=(N, S, E))
+        btn_ensure.grid(column=0, row=4, columnspan=1, sticky=(N, S, E, W), pady=20)
+        btn_cancel.grid(column=1, row=4, columnspan=1, sticky=(N, S, W, E))
 
     def ensure_command(self):
         dbo = DBOperator()
         if self.is_edit:
-            res = dbo.update_book_in_library(self.entry_name.get(), self.entry_author.get(),
-                                             self.entry_press.get(), self.entry_quantity.get(), self.book_id)
-            if res[0]:
-                self.is_success = 1
-
-
+            if self.b_name.get() == "" or self.b_author.get() == "" or self.b_press.get() == "" or self.b_quantity.get() == "":
+                messagebox.showinfo(message="请检查输入框是否填入相应的值！！！", icon="error")
+            else:
+                res = dbo.update_book_in_library(self.b_name.get(), self.b_author.get(),
+                                                 self.b_press.get(), self.b_quantity.get(), self.book_id)
+                if res[0]:
+                    messagebox.showinfo(message="修改成功！！！", icon="info")
+                    self.window_exit()
+                else:
+                    messagebox.showinfo(message="修改失败！！！", icon="error")
         else:
-            res = dbo.add_new_book(self.entry_name.get(), self.entry_author.get(),
-                                   self.entry_press.get(), self.entry_quantity.get())
-            if res[1]:
-                self.is_success = 1
+            if self.b_name.get() == "" or self.b_author.get() == "" or self.b_press.get() == "" or self.b_quantity.get() == "":
+                messagebox.showinfo(message="请检查输入框是否填入相应的值！！！", icon="error")
+            else:
+                res = dbo.add_new_book(self.b_name.get(), self.b_author.get(),
+                                       self.b_press.get(), self.b_quantity.get())
+                if res[0]:
+                    self.window_exit()
+                    messagebox.showinfo(message="添加成功！！！", icon="info")
+                else:
+                    messagebox.showinfo(message="添加失败！！！", icon="error")
 
-    def cancel_command(self):
-        self.top.grab_release()
-        self.top.destroy()
+    def window_exit(self):
+        self.grab_release()
+        self.destroy()
 
 
 if __name__ == '__main__':

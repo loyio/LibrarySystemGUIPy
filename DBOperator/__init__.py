@@ -78,7 +78,7 @@ class DBOperator:
             self.conn.commit()
         return res
 
-    def update_book_in_library(self, b_id, b_name, b_author, b_press, b_quantity):
+    def update_book_in_library(self, b_name, b_author, b_press, b_quantity, b_id):
         with self.conn:
             with self.conn.cursor() as cursor:
                 sql = "UPDATE `book` set `book_name` = %s, `book_author` = %s, `book_press` = %s, `book_quantity` = %s where `book_id`=%s"
